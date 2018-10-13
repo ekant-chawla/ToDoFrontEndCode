@@ -4,7 +4,7 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 
 ## Development server
 
-Run `ng serve` for a dev server if you are using the live api in the api service, otherwise add `proxy-config --proxy-config.json` to enable the proxy pass and avoid CROS error. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+Run `ng serve` for a dev server if you are using the live api in the api service, otherwise add `--proxy-config proxy-config.json` to enable the proxy pass and avoid CROS error. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
 
 ## Code scaffolding
 
