@@ -1,0 +1,84 @@
+<nav class="navbar bg-purple fluid-container">
+  <div class="row w-100 no-gutters">
+
+    <div style="min-height: 48px" class="col-6 col-md-9 cursor-pointer">
+      <div [routerLink]="['/todo']" class="col-12 text-truncate room-title">TODO APP</div>
+    </div>
+
+    <div class="col-2 col-md-1 text-right">
+      <img [routerLink]="['/friends']" class="icon my-2 my-75" title="Friends" src="assets/friend.svg">
+      <span class="badge badge-pill badge-danger notification-badge">{{requestCount}}</span>
+    </div>
+
+    <div class="col-2 col-md-1 text-right">
+      <img [routerLink]="['/notifications']" class="icon my-2 my-75" title="Notifications" src="assets/notification.svg">
+    </div>
+
+    <div class="col-2 col-md-1 text-right">
+      <img class="icon my-2 my-75" title="Logout" src="assets/logout.svg" (click)="logout()">
+    </div>
+
+  </div>
+</nav>
+
+<div class="container cover-height">
+  <h1 class="mt-3">Notifications</h1>
+
+  <div *ngIf="notifications && notifications.length>0 else noNotification" class="row my-3">
+    <ng-container *ngFor="let notification of notifications">
+
+      <div *ngIf="notification.type =='friend-add'" class="card custom-card cursor-pointer my-2 w-100">
+        <div [routerLink]="['/todo']" [queryParams]="{'user':notification.targetId}" class="card-body">
+          <h5 class="card-title">{{notification.title}}</h5>
+          <h6 *ngIf="notification.message && notification.message!=''" class="card-subtitle mb-2 text-muted">{{notification.message}}</h6>
+        </div>
+      </div>
+
+      <div *ngIf="notification.type =='friend-request'" class="card custom-card">
+        <div [routerLink]="['/friends']" class="card-body cursor-pointer my-2 w-100">
+          <h5 class="card-title">{{notification.title}}</h5>
+          <h6 *ngIf="notification.message && notification.message!=''" class="card-subtitle mb-2 text-muted">{{notification.message}}</h6>
+        </div>
+      </div>
+
+      <div *ngIf="notification.type =='todo-create' || notification.type=='todo-update' || notification.type=='todo'||notification.type=='todo-create-item'||notification.type=='todo-update-item' "
+        class="card custom-card cursor-pointer my-2 w-100">
+        <div [routerLink]="['/todo',notification.targetId]" class="card-body">
+          <h5 class="card-title">{{notification.title}}</h5>
+          <h6 *ngIf="notification.message && notification.message!=''" class="card-subtitle mb-2 text-muted">{{notification.message}}</h6>
+        </div>
+      </div>
+
+
+    </ng-container>
+
+
+    <div class="row" *ngIf="hasMorePages">
+      <div class="col-12 mb-3 mt-2">
+        <input class="btn btn-secondary" type="button" (click)='listMore()' value="Load More">
+      </div>
+    </div>
+
+  </div>
+
+
+
+  <ng-template #noNotification>
+    <div class="row">
+      <div *ngIf='!gettingData' class="col-12 text-center">
+        You have No Notifications!
+      </div>
+    </div>
+  </ng-template>
+
+  <div *ngIf='gettingData' class="row">
+    <div class="col-12">
+      <div class="text-center">
+        <div class="lds-dual-ring my-3"></div>
+        <p>Getting todo list</p>
+      </div>
+    </div>
+
+
+
+  </div>

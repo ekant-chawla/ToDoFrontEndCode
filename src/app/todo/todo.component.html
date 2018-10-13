@@ -1,0 +1,111 @@
+<!--Modal-->
+<div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-purple">
+
+        <h5 class="modal-title" id="modalLabel">Create Todo</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+
+        <form #createEdit="ngForm" ngNativeValidate>
+
+          <label for="title">Title</label>
+          <input #todoTitle="ngModel" class="form-control" required type="text" id="title" [(ngModel)]="title" name="title"
+            placeholder="Enter Name">
+
+          <label for="description">Description</label>
+          <input type="text" id="description" class="form-control" id="description" [(ngModel)]="description" name="description">
+
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button [disabled]="todoTitle.invalid" id="save-button" type="button" class="btn bg-purple" data-dismiss="modal"
+          (click)="createTodo()">Create</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<nav class="navbar bg-purple fluid-container">
+  <div class="row w-100 no-gutters">
+
+    <div style="min-height: 48px" class="col-6 col-md-9 cursor-pointer">
+      <div [routerLink]="['/todo']" class="col-12 text-truncate room-title">TODO APP</div>
+    </div>
+
+    <div class="col-2 col-md-1 text-right">
+      <img [routerLink]="['/friends']" class="icon my-2 my-75" title="Friends" src="assets/friend.svg">
+      <span class="badge badge-pill badge-danger notification-badge">{{requestCount}}</span>
+    </div>
+
+    <div class="col-2 col-md-1 text-right">
+      <img [routerLink]="['/notifications']" class="icon my-2 my-75" title="Notifications" src="assets/notification.svg">
+      <span class="badge badge-pill badge-danger notification-badge">{{notificationCount}}</span>
+    </div>
+
+    <div class="col-2 col-md-1 text-right">
+      <img class="icon my-2 my-75" title="Logout" src="assets/logout.svg" (click)="logout()">
+    </div>
+
+  </div>
+</nav>
+
+
+<div class="container cover-height">
+
+  <div class="row my-3">
+    <div class="col-12">
+      <button *ngIf="isUsersTodoList" type="button" class="btn bg-purple" data-toggle="modal" data-target="#modal">
+        Create Todo
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="todoList && todoList.length>0 else notodo" class="row">
+
+    <ng-container *ngFor="let todo of todoList">
+      <div *ngIf="todo.completed == allowed || allowed == undefined" class="col-12 col-lg-6 w-100">
+        <div [routerLink]="['/todo',todo.id]" [ngClass]="{'complete':todo.completed,'incomplete':!todo.completed}"
+          class="card custom-card cursor-pointer">
+          <div class="card-body">
+            <h5 class="card-title">{{todo.title}} ({{todo.id}})</h5>
+            <h6 *ngIf="todo.description && todo.description!=''" class="card-subtitle mb-2 text-muted">{{todo.description}}</h6>
+          </div>
+        </div>
+      </div>
+
+    </ng-container>
+
+
+    <div class="row" *ngIf="hasMorePages">
+      <div class="col-12 mb-3 mt-2">
+        <input class="btn btn-secondary" type="button" (click)='listMore()' value="Load More">
+      </div>
+    </div>
+
+  </div>
+
+  <ng-template #notodo>
+    <div *ngIf='!gettingData && todoList && todoList.length==0 ' class="row">
+      <div class="col-12">
+        <div class="text-center">There are no todos for listing</div>
+      </div>
+    </div>
+  </ng-template>
+
+  <div *ngIf='gettingData' class="row">
+    <div class="col-12">
+      <div class="text-center">
+        <div class="lds-dual-ring my-3"></div>
+        <p>Getting todo lists</p>
+      </div>
+    </div>
+
+  </div>
+
+</div>

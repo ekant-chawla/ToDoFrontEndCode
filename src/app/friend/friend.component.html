@@ -1,0 +1,142 @@
+<div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-purple">
+
+        <h5 class="modal-title" id="modalLabel">Add Friend</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+
+        <form #addFriendForm="ngForm" ngNativeValidate>
+
+          <label for="title">Email</label>
+          <input required pattern="^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$" #mail="ngModel" class="form-control"
+            type="text" id="email" [(ngModel)]="email" name="email" placeholder="Enter Email">
+
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button [disabled]="mail.invalid" id="save-button" type="button" class="btn bg-purple" data-dismiss="modal"
+          (click)="addFriend();addFriendForm.reset()">Send Request</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<nav class="navbar bg-purple fluid-container">
+  <div class="row w-100 no-gutters">
+
+    <div style="min-height: 48px" class="col-6 col-md-9 cursor-pointer">
+      <div [routerLink]="['/todo']" class="col-12 text-truncate room-title">TODO APP</div>
+    </div>
+
+    <div class="col-2 col-md-1 text-right">
+      <img [routerLink]="['/friends']" class="icon my-2 my-75" title="Friends" src="assets/friend.svg">
+    </div>
+
+    <div class="col-2 col-md-1 text-right">
+      <img [routerLink]="['/notifications']" class="icon my-2 my-75" title="Notifications" src="assets/notification.svg">
+      <span class="badge badge-pill badge-danger notification-badge">{{notificationCount}}</span>
+    </div>
+
+    <div class="col-2 col-md-1 text-right">
+      <img class="icon my-2 my-75" title="Logout" src="assets/logout.svg" (click)="logout()">
+    </div>
+
+  </div>
+</nav>
+
+
+<div class="container cover-height">
+
+  <div class="row my-3">
+    <div class="col-12">
+      <button type="button" class="btn bg-purple" data-toggle="modal" data-target="#modal"> Add Friend
+      </button>
+    </div>
+  </div>
+
+  <h1>Friend List</h1>
+
+  <div *ngIf="friendList && friendList.length>0; else nofriends" class="row">
+
+    <ng-container *ngFor="let friendObj of friendList">
+      <div class="col-12 col-md-6 col-lg-4">
+
+        <div [routerLink]="['/todo']" [queryParams]="{'user':friendObj.friendId}" class="card custom-card cursor-pointer mt-3">
+          <div class="card-body">
+            <h5 class="card-title">{{friendObj.friend.firstName}} {{friendObj.friend.lastName}}</h5>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+
+    <div *ngIf="hasMoreFriend" class="col-12">
+      <input class="btn btn-secondary" type="button" (click)='listMoreFriend()' value="Load More">
+    </div>
+
+  </div>
+
+  <ng-template #nofriends>
+    <div class="row">
+      <div  *ngIf='!gettingFriendData' class="col-12 text-center my-3">
+        You have No Friends!
+      </div>
+    </div>
+  </ng-template>
+
+  <div *ngIf='gettingFriendData' class="row">
+    <div class="col-12">
+      <div class="text-center">
+        <div class="lds-dual-ring my-3"></div>
+        <p>Getting Friend List</p>
+      </div>
+    </div>
+  </div>
+
+
+  <h1 class="my-3">Request List</h1>
+
+  <div *ngIf="requestList && requestList.length>0; else norequests" class="row">
+    <ng-container *ngFor="let requestObj of requestList">
+      <div class="col-12 col-md-6 col-lg-4 mt-3">
+        <div class="card custom-card cursor-pointer">
+          <div class="card-body">
+            <h5 class="card-title">{{requestObj.sender.firstName}} {{requestObj.sender.lastName}}</h5>
+            <button type="button" class="btn bg-purple mt-2" (click)="acceptRequest(requestObj.sender.userId)">Accept</button>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+    <div class="col-12" *ngIf="hasMoreRequest">
+      <input class="btn btn-secondary" type="button" (click)='listMoreRequest()' value="Load More">
+    </div>
+
+  </div>
+
+  <ng-template #norequests>
+    <div class="row">
+      <div *ngIf='!gettingRequestData' class="col-12 text-center my-3">
+        You have No Requests!
+      </div>
+    </div>
+  </ng-template>
+
+  <div *ngIf='gettingRequestData' class="row">
+    <div class="col-12">
+      <div class="text-center">
+        <div class="lds-dual-ring my-3"></div>
+        <p>Getting Request List</p>
+      </div>
+    </div>
+  </div>
+
+
+
+</div>

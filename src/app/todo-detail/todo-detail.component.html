@@ -1,0 +1,196 @@
+<div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-purple">
+
+        <h5 *ngIf='isNew' class="modal-title" id="modalLabel">Create Todo Item</h5>
+        <h5 *ngIf='!isNew' class="modal-title" id="modalLabel">Edit Todo Item</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+
+        <form #createEdit="ngForm" ngNativeValidate>
+
+          <label for="title">Title</label>
+          <input #todoTitle="ngModel" class="form-control" required type="text" id="title" [(ngModel)]="title" name="title"
+            placeholder="Enter Titile">
+
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button *ngIf='isNew' [disabled]="todoTitle.invalid" id="save-button" type="button" class="btn bg-purple"
+          data-dismiss="modal" (click)="createItem()">Create</button>
+        <button *ngIf='!isNew' [disabled]="todoTitle.invalid || todoTitle.pristine " id="save-button" type="button"
+          class="btn bg-purple" data-dismiss="modal" (click)="renameItem()">Update</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<button id='b' hidden type="button" class="btn btn-secondary" data-toggle="modal" data-target="#modal">
+  Create Todo
+</button>
+
+
+
+<nav class="navbar bg-purple fluid-container">
+  <div class="row w-100 no-gutters">
+
+    <div style="min-height: 48px" class="col-6 col-md-9 cursor-pointer">
+      <div [routerLink]="['/todo']" class="col-12 text-truncate room-title">TODO APP</div>
+    </div>
+
+    <div class="col-2 col-md-1 text-right">
+      <img [routerLink]="['/friends']" class="icon my-2 my-75" title="Friends" src="assets/friend.svg">
+      <span class="badge badge-pill badge-danger notification-badge">{{requestCount}}</span>
+    </div>
+
+    <div class="col-2 col-md-1 text-right">
+      <img [routerLink]="['/notifications']" class="icon my-2 my-75" title="Notifications" src="assets/notification.svg">
+      <span class="badge badge-pill badge-danger notification-badge">{{notificationCount}}</span>
+    </div>
+
+    <div class="col-2 col-md-1 text-right">
+      <img class="icon my-2 my-75" title="Logout" src="assets/logout.svg" (click)="logout()">
+    </div>
+
+  </div>
+</nav>
+
+<div *ngIf='todo else notodo' class="container cover-height">
+
+  <div class="row my-3">
+    <div *ngIf="isUsersTodoList" class="col-6 col-md-3 mt-2">
+      <button [disabled]='disableCreateEdit' type="button" class="btn bg-purple" (click)='openCreateNew("")'>
+        Create Item
+      </button>
+    </div>
+    <div *ngIf='todo && !todo.completed && isUsersTodoList' class="col-6 col-md-3 mt-2">
+      <button [disabled]='disableCreateEdit' type="button" class="btn bg-purple" (click)='closeTodo()'>
+        Close Todo </button>
+    </div>
+    <div *ngIf='todo && todo.completed && isUsersTodoList' class="col-6 col-md-3 mt-2">
+      <button [disabled]='disableCreateEdit' type="button" class="btn bg-purple" (click)='openTodo()'>
+        Open Todo
+      </button>
+    </div>
+
+    <div class="col-6 col-md-3 mt-2">
+      <button [disabled]='disableUndo' type="button" class="btn btn-secondary" (click)='undo()'>
+        Undo
+      </button>
+    </div>
+
+  </div>
+
+
+  <div class="row">
+    <div class="col-12">
+      <h1>{{todo.title}} ({{todo.id}})</h1>
+    </div>
+  </div>
+
+  <div *ngIf="todo.list && todo.list.length > 0 else listEmpty" class="row">
+
+    <ng-container *ngFor="let item of todo.list">
+      <div *ngIf="!item.deleted" [ngClass]="{'complete':item.completed,'incomplete':!item.completed}" class="list-item py-2 mt-3 col-12">
+        <h2 class="p-0 d-inline-flex col-8 flex-wrap cursor-pointer" title="Click To Get Sub-todo Items" (click)='listSubItems(item.id)'>{{item.title}}
+          ({{item.id}})</h2>
+
+        <div class="option-container p-0 col-4 d-inline-flex flex-wrap">
+
+          <div *ngIf='isUsersTodoList' class="col-6 col-lg-3 d-inline-flex justify-content-end my-1">
+            <img class="icon" title="Create Todo Item" src="assets/plus.svg" (click)="openCreateNew(item.id)">
+          </div>
+
+          <div class="col-6 col-lg-3 d-inline-flex justify-content-end my-1">
+            <img class="icon" title="Edit Todo Item" src="assets/edit.svg" (click)="openEdit(item.id,item.title)">
+          </div>
+
+          <div *ngIf='item.completed' class="col-6 col-lg-3 d-inline-flex justify-content-end my-1">
+            <img class="icon" title="Open Item" src="assets/closed.svg" (click)="openItem(item.id)">
+          </div>
+
+          <div *ngIf='!item.completed' class="col-6 col-lg-3 d-inline-flex justify-content-end my-1">
+            <img class="icon" title="Close Item" src="assets/open.svg" (click)="closeItem(item.id)">
+          </div>
+
+          <div class="col-6 col-lg-3 d-inline-flex justify-content-end my-1">
+            <img class=" icon" title="Delete Todo Item" src="assets/delete.svg" (click)="markItemDeleted(item.id)">
+          </div>
+
+        </div>
+
+        <div *ngIf='item.list && item.list.length>0' class="pl-3 py-2 mt-1 d-inline-flex flex-wrap col-12">
+          <ng-container *ngFor='let subitem of item.list'>
+            <div *ngIf="!subitem.deleted" [ngClass]="{'complete':subitem.completed,'incomplete':!subitem.completed}"
+              class="list-item col-12">
+
+              <h3 class="p-0 d-inline-flex col-8 flex-wrap">{{subitem.title}} ({{subitem.id}})</h3>
+
+              <div class="option-container p-0 col-4 d-inline-flex flex-wrap">
+
+                <div class="col-6 col-lg-3 d-inline-flex justify-content-end my-1">
+                  <img class="icon" title="Edit Todo Item" src="assets/edit.svg" (click)="openEdit(subitem.id,subitem.title)">
+                </div>
+
+                <div *ngIf='subitem.completed' class="col-6 col-lg-3 d-inline-flex justify-content-end my-1">
+                  <img class="icon" title="Open Item" src="assets/closed.svg" (click)="openItem(subitem.id)">
+                </div>
+
+                <div *ngIf='!subitem.completed' class="col-6 col-lg-3 d-inline-flex justify-content-end my-1">
+                  <img class="icon" title="Close Item" src="assets/open.svg" (click)="closeItem(subitem.id)">
+                </div>
+
+                <div class="col-6 col-lg-3 d-inline-flex justify-content-end my-1">
+                  <img class=" icon" title="Delete Todo Item" src="assets/delete.svg" (click)="markItemDeleted(subitem.id)">
+                </div>
+
+              </div>
+            </div>
+          </ng-container>
+        </div>
+
+      </div>
+    </ng-container>
+
+
+  </div>
+
+
+</div>
+
+<ng-template #notodo>
+  <div class="container cover-height">
+    <div class="row mt-3">
+
+      <div class="col-12 text-center">
+        <p>No such todo found.</p>
+      </div>
+
+    </div>
+  </div>
+</ng-template>
+
+<div class="container cover-height">
+  <div class="row mt-3">
+
+    <div class="col-12 text-center">
+      <div class="lds-dual-ring my-3"></div>
+      <p>Please wait..fetching data.</p>
+    </div>
+
+  </div>
+</div>
+
+<ng-template #listEmpty>
+  <div class="row">
+    <div class="col-12 text-center mt-3">
+      <p>There are no items in this todo</p>
+    </div>
+  </div>
+</ng-template>
